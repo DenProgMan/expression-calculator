@@ -19,12 +19,19 @@ function simpleCalc(num1, oper, num2) {
             return num1 + num2;
             break;
         case '-':
+            // console.log('Num1', num1); // FIXME: Удалить этот console log
+            // console.log('Num2', num2); // FIXME: Удалить этот console log
+            // console.log('Oper', oper); // FIXME: Удалить этот console log
             return num1 - num2;
             break;
         case '/':
             if (num2 === 0) {
                 throw new Error('TypeError: Division by zero.');
             }
+            // console.log('Num1', num1); // FIXME: Удалить этот console log
+            // console.log('Num2', num2); // FIXME: Удалить этот console log
+            // console.log('Oper', oper); // FIXME: Удалить этот console log
+            // console.log('=', num1 / num2); // FIXME: Удалить этот console log
             return num1 / num2;
             break;
         case '*':
@@ -35,23 +42,32 @@ function simpleCalc(num1, oper, num2) {
 }
 
 function getRegEx(oper) {
-    return new RegExp(`${DE}\\s*${oper}\\s*${DE}`, 'g');
+    // return new RegExp(`${DE}\\s*${oper}\\s*${DE}`, 'g');
+    return new RegExp(`${DE}\\s*${oper}\\s*${DE}`);
 }
 
 function calculateBrackets(expr) {
+    while (expr.match(/-\s*-/g)) {
+        expr = expr.replace(/-\s*-/g, '+');
+    }
+
+    // console.log(expr); // FIXME: Удалить этот console log
     let regExStr = getRegEx('\/');
     while (expr.match(regExStr)) {
+        // console.log('Devide', expr); // FIXME: Удалить этот console log
         expr = expr.replace(regExStr, (e, num1, num2) => simpleCalc(num1, '/', num2));
     }
 
     regExStr = getRegEx('\\*');
     while (expr.match(regExStr)) {
         expr = expr.replace(regExStr, (e, num1, num2) => simpleCalc(num1, '*', num2));
+        // console.log(expr); // FIXME: Удалить этот console log
     }
 
     regExStr = getRegEx('-');
     while (expr.match(regExStr)) {
         expr = expr.replace(regExStr, (e, num1, num2) => simpleCalc(num1, '-', num2));
+        // console.log(expr); // FIXME: Удалить этот console log
     }
 
     regExStr = getRegEx('\\+');
@@ -70,12 +86,11 @@ function calculateBrackets(expr) {
 function expressionCalculator(expr) {
     if (expr.match(/[\(\)]/g)) {
         while (expr.match(/\([e\.0-9\*\/\+\-\s]*\)/g)) {
-
-            expr = expr.replace(/\(([e\.0-9\*\/\+\-\s]*)\)/g, (e, str) => calculateBrackets(str));
             // console.log(expr); // FIXME: Удалить этот console log
+            expr = expr.replace(/\(([e\.0-9\*\/\+\-\s]*)\)/g, (e, str) => calculateBrackets(str));
         }
     }
-    // console.log(expr); // FIXME: Удалить этот console log
+    console.log(expr); // FIXME: Удалить этот console log
     if (expr.match(/[\(\)]/g)) {
         throw new Error('ExpressionError: Brackets must be paired');
     }
@@ -88,4 +103,5 @@ module.exports = {
 }
 // console.log(expressionCalculator(" 24 - 23 * 17 / (  93 + 52 * 70 * (  6 + 91 / (  (  4 / 39 / 8 * 30  ) / (  22 * 97 * (  32 * 20 * (  82 - 80 * 51 / 89 * 9  ) * 56 + 82  ) * 89  ) - 17 - 17  ) / 29 / 81  )  ) ")); // FIXME: Удалить этот console log
 
-// console.log(expressionCalculator('(  75 - 15 - -17.239999999999995 * 27 - 73  )')); // FIXME: Удалить этот console log
+// console.log(expressionCalculator('(  6 + 91 / -34.00000000000017 / 29 / 81  )')); // FIXME: Удалить этот console log
+// console.log(expressionCalculator('91 / -34.00000000000017')); // FIXME: Удалить этот console log
