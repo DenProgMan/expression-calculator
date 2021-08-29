@@ -3,10 +3,89 @@ function eval() {
     return;
 }
 
+// const DE = '(-*\\s*\\d+[.]*\\d*)'; //digit expression
+const DE = '((?:-\\s*)?\\d+[.]*\\d*(?:e-)?\\d*)'; //digit expression
+
+function simpleCalc(num1, oper, num2) {
+    num1 = +num1.replaceAll(' ', '');
+    num2 = +num2.replaceAll(' ', '');
+
+    // console.log('Num1', num1); // FIXME: Удалить этот console log
+    // console.log('Num2', num2); // FIXME: Удалить этот console log
+    // console.log('Oper', oper); // FIXME: Удалить этот console log
+
+    switch (oper) {
+        case '+':
+            return num1 + num2;
+            break;
+        case '-':
+            return num1 - num2;
+            break;
+        case '/':
+            if (num2 === 0) {
+                throw new Error('TypeError: Division by zero.');
+            }
+            return num1 / num2;
+            break;
+        case '*':
+            return num1 * num2;
+            break;
+    }
+
+}
+
+function getRegEx(oper) {
+    return new RegExp(`${DE}\\s*${oper}\\s*${DE}`, 'g');
+}
+
+function calculateBrackets(expr) {
+    let regExStr = getRegEx('\/');
+    while (expr.match(regExStr)) {
+        expr = expr.replace(regExStr, (e, num1, num2) => simpleCalc(num1, '/', num2));
+    }
+
+    regExStr = getRegEx('\\*');
+    while (expr.match(regExStr)) {
+        expr = expr.replace(regExStr, (e, num1, num2) => simpleCalc(num1, '*', num2));
+    }
+
+    regExStr = getRegEx('-');
+    while (expr.match(regExStr)) {
+        expr = expr.replace(regExStr, (e, num1, num2) => simpleCalc(num1, '-', num2));
+    }
+
+    regExStr = getRegEx('\\+');
+    while (expr.match(regExStr)) {
+        expr = expr.replace(regExStr, (e, num1, num2) => simpleCalc(num1, '+', num2));
+    }
+
+    if (expr.match(/\s/g)) {
+        expr = expr.trim().replace(/\s+/g, '+');
+        expr = calculateBrackets(expr);
+    }
+
+    return expr;
+}
+
 function expressionCalculator(expr) {
-    // write your solution here
+    if (expr.match(/[\(\)]/g)) {
+        while (expr.match(/\([e\.0-9\*\/\+\-\s]*\)/g)) {
+
+            expr = expr.replace(/\(([e\.0-9\*\/\+\-\s]*)\)/g, (e, str) => calculateBrackets(str));
+            // console.log(expr); // FIXME: Удалить этот console log
+        }
+    }
+    // console.log(expr); // FIXME: Удалить этот console log
+    if (expr.match(/[\(\)]/g)) {
+        throw new Error('ExpressionError: Brackets must be paired');
+    }
+
+    return +calculateBrackets(expr);
 }
 
 module.exports = {
     expressionCalculator
 }
+// console.log(expressionCalculator(" 24 - 23 * 17 / (  93 + 52 * 70 * (  6 + 91 / (  (  4 / 39 / 8 * 30  ) / (  22 * 97 * (  32 * 20 * (  82 - 80 * 51 / 89 * 9  ) * 56 + 82  ) * 89  ) - 17 - 17  ) / 29 / 81  )  ) ")); // FIXME: Удалить этот console log
+
+// console.log(expressionCalculator('(  75 - 15 - -17.239999999999995 * 27 - 73  )')); // FIXME: Удалить этот console log
