@@ -7,8 +7,8 @@ function eval() {
 const DE = '((?:-\\s*)?\\d+[.]*\\d*(?:e-)?\\d*)'; //digit expression
 
 function simpleCalc(num1, oper, num2) {
-    num1 = +num1.replaceAll(' ', '');
-    num2 = +num2.replaceAll(' ', '');
+    num1 = +num1.replace(/\s*/g, '');
+    num2 = +num2.replace(/\s*/g, '');
 
     // console.log('Num1', num1); // FIXME: Удалить этот console log
     // console.log('Num2', num2); // FIXME: Удалить этот console log
